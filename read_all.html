@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>read_all.html</title>
+	<!-- jQuery -->
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script>
+		function read_all(file) {
+			if (file.size > 2 * 1024 * 1024) {
+				alert("Too large file");
+				return;
+			}
+			let reader = new FileReader();
+			reader.onload = function() {
+				$("#output").append($("<p>").text(file.name));
+				let textarea = $("<textarea>").val(reader.result);
+				textarea.prop("cols", "80");
+				textarea.prop("rows", "10");
+				$("#output").append(textarea);
+			};
+			reader.readAsText(file);
+		}
+		$(function() {
+			
+			$("#input_files").on('change', function(e){
+				let files = e.target.files;
+				for (let i = 0; i < files.length; ++i) {
+					read_all(files[i]);
+				}
+			});
+			$("#input_panel").on('drop', function(_e){
+				let e = _e;
+				if(_e.originalEvent) {
+					e = _e.originalEvent;
+				}
+				e.stopPropagation();
+				e.preventDefault();
+				let files = e.dataTransfer.files;
+				for (let i = 0; i < files.length; ++i) {
+					read_all(files[i]);
+				}
+				$(this).removeClass("dragging_over");
+			});
+			$("#input_panel").on('dragenter dragover', function(e){
+				e.stopPropagation();
+				e.preventDefault();
+				$(this).addClass("dragging_over");
+			});
+			$("#input_panel").on('dragleave', function(e){
+				e.stopPropagation();
+				e.preventDefault();
+				$(this).removeClass("dragging_over");
+			});
+		});
+	</script>
+	<style>
+		.invisible {
+			display: none;
+		}
+		.droppable_panel {
+			border: 4px black dotted;
+			padding: 8px;
+		}
+		.dragging_over {
+			border: 2px green solid;
+		}
+	</style>
+</head>
+<body>
+	<div id="input_panel" class="droppable_panel">
+		<h1>read_all.html</h1>
+		<hr />
+		<button>
+			<label for="input_files">
+				Upload
+			</label>
+			<input type="file" id="input_files" multiple class="invisible" />
+		</button>
+		<hr />
+		<div id="output"></div>
+	</div>
+</body></html>
